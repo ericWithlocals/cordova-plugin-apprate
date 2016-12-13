@@ -1,23 +1,23 @@
 /*
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- *
- */;
+  *
+  * Licensed to the Apache Software Foundation (ASF) under one
+  * or more contributor license agreements. See the NOTICE file
+  * distributed with this work for additional information
+  * regarding copyright ownership. The ASF licenses this file
+  * to you under the Apache License, Version 2.0 (the
+  * "License"); you may not use this file except in compliance
+  * with the License. You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing,
+  * software distributed under the License is distributed on an
+  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  * KIND, either express or implied. See the License for the
+  * specific language governing permissions and limitations
+  * under the License.
+  *
+  */;
 var AppRate, Locales, exec;
 
 Locales = require('./locales');
@@ -25,7 +25,7 @@ Locales = require('./locales');
 exec = require('cordova/exec');
 
 AppRate = (function() {
-  var FLAG_NATIVE_CODE_SUPPORTED, LOCAL_STORAGE_COUNTER, PREF_STORE_URL_FORMAT_IOS, PREF_STORE_URL_FORMAT_IOS7, counter, getAppTitle, getAppVersion, localStorageParam, promptForRatingWindowButtonClickHandler, showDialog, updateCounter;
+  var FLAG_NATIVE_CODE_SUPPORTED, LOCAL_STORAGE_COUNTER, PREF_STORE_URL_FORMAT_IOS, counter, getAppTitle, getAppVersion, localStorageParam, promptForRatingWindowButtonClickHandler, showDialog, updateCounter;
 
   function AppRate() {}
 
@@ -33,9 +33,8 @@ AppRate = (function() {
 
   FLAG_NATIVE_CODE_SUPPORTED = /(iPhone|iPod|iPad|Android)/i.test(navigator.userAgent.toLowerCase());
 
-  PREF_STORE_URL_FORMAT_IOS = "itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=";
-
-  PREF_STORE_URL_FORMAT_IOS7 = "itms-apps://itunes.apple.com/app/id";
+  PREF_STORE_URL_FORMAT_IOS9 = "itms-apps://itunes.apple.com/app/viewContentsUserReviews/id";
+  PREF_STORE_URL_FORMAT_IOS8 = "http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?pageNumber=0&sortOrdering=1&type=Purple+Software&mt=8&id=";
 
   counter = {
     applicationVersion: void 0,
@@ -43,19 +42,25 @@ AppRate = (function() {
   };
 
   promptForRatingWindowButtonClickHandler = function(buttonIndex) {
-    var _base;
+    var base;
     switch (buttonIndex) {
+      case 0:
+        updateCounter('reset');
+        break;
       case 1:
         updateCounter('stop');
+        AppRate.navigateToAppStore();
         break;
       case 2:
         updateCounter('reset');
         break;
       case 3:
         updateCounter('stop');
-        AppRate.navigateToAppStore();
     }
-    return typeof (_base = AppRate.preferences.callbacks).onButtonClicked === "function" ? _base.onButtonClicked(buttonIndex) : void 0;
+    //This is called only in case the user clicked on a button
+    typeof (base = AppRate.preferences.callbacks).onButtonClicked === "function" ? base.onButtonClicked(buttonIndex) : void 0;
+    //This one is called anyway once the process is done
+    return typeof (base = AppRate.preferences.callbacks).done === "function" ? base.done() : void 0;
   };
 
   updateCounter = function(action) {
@@ -79,15 +84,17 @@ AppRate = (function() {
   };
 
   showDialog = function(immediately) {
-    var localeObj, _base;
+    var base, localeObj;
     if (counter.countdown === AppRate.preferences.usesUntilPrompt || immediately) {
       if (!AppRate.preferences.useCustomRateDialog) {
         localeObj = AppRate.preferences.customLocale || Locales.getLocale(AppRate.preferences.useLanguage, AppRate.preferences.displayAppName);
-        navigator.notification.confirm(localeObj.message, promptForRatingWindowButtonClickHandler, localeObj.title, [localeObj.cancelButtonLabel, localeObj.laterButtonLabel, localeObj.rateButtonLabel]);
+        navigator.notification.confirm(localeObj.message, promptForRatingWindowButtonClickHandler, localeObj.title, [localeObj.rateButtonLabel, localeObj.laterButtonLabel, localeObj.cancelButtonLabel]);
       }
-      if (typeof (_base = AppRate.preferences.callbacks).onRateDialogShow === "function") {
-        _base.onRateDialogShow(promptForRatingWindowButtonClickHandler);
+      if (typeof (base = AppRate.preferences.callbacks).onRateDialogShow === "function") {
+        base.onRateDialogShow(promptForRatingWindowButtonClickHandler);
       }
+    }else{
+      typeof (base = AppRate.preferences.callbacks).done === "function" ? base.done() : void 0;
     }
     return AppRate;
   };
@@ -133,7 +140,9 @@ AppRate = (function() {
   };
 
   AppRate.init = function() {
-    counter = JSON.parse(localStorageParam(LOCAL_STORAGE_COUNTER)) || counter;
+    if(localStorageParam(LOCAL_STORAGE_COUNTER)){
+      counter = JSON.parse(localStorageParam(LOCAL_STORAGE_COUNTER)) || counter;
+    }
     getAppVersion((function(_this) {
       return function(applicationVersion) {
         if (counter.applicationVersion !== applicationVersion) {
@@ -165,20 +174,22 @@ AppRate = (function() {
     useCustomRateDialog: false,
     callbacks: {
       onButtonClicked: null,
-      onRateDialogShow: null
+      onRateDialogShow: null,
+      done:null
     },
     storeAppURL: {
       ios: null,
       android: null,
       blackberry: null,
-      windows8: null
+      windows8: null,
+      windows: null
     },
     customLocale: null
   };
 
   AppRate.promptForRating = function(immediately) {
     if (immediately == null) {
-      immediately = false;
+      immediately = true;
     }
     if (this.preferences.useLanguage === null) {
       navigator.globalization.getPreferredLanguage((function(_this) {
@@ -196,24 +207,34 @@ AppRate = (function() {
 
   AppRate.navigateToAppStore = function() {
     var iOSVersion;
+    var PREF_STORE_URL_FORMAT_IOS;
+    var appStoreUrl;
     if (/(iPhone|iPod|iPad)/i.test(navigator.userAgent.toLowerCase())) {
       if (this.preferences.openStoreInApp) {
         exec(null, null, 'AppRate', 'launchAppStore', [this.preferences.storeAppURL.ios]);
       } else {
         iOSVersion = navigator.userAgent.match(/OS\s+([\d\_]+)/i)[0].replace(/_/g, '.').replace('OS ', '').split('.');
         iOSVersion = parseInt(iOSVersion[0]) + (parseInt(iOSVersion[1]) || 0) / 10;
-        if ((7.1 > iOSVersion && iOSVersion >= 7.0)) {
-          window.open(PREF_STORE_URL_FORMAT_IOS7 + this.preferences.storeAppURL.ios, '_system');
+        if (iOSVersion < 9) {
+          PREF_STORE_URL_FORMAT_IOS = PREF_STORE_URL_FORMAT_IOS8;
         } else {
-          window.open(PREF_STORE_URL_FORMAT_IOS + this.preferences.storeAppURL.ios, '_system');
+          PREF_STORE_URL_FORMAT_IOS = PREF_STORE_URL_FORMAT_IOS9;
         }
+        appStoreUrl = PREF_STORE_URL_FORMAT_IOS + this.preferences.storeAppURL.ios;
       }
     } else if (/(Android)/i.test(navigator.userAgent.toLowerCase())) {
-      window.open(this.preferences.storeAppURL.android, '_system');
+      appStoreUrl = this.preferences.storeAppURL.android
+    } else if (/(Windows|Edge)/i.test(navigator.userAgent.toLowerCase())) {
+      appStoreUrl = this.preferences.storeAppURL.windows
     } else if (/(BlackBerry)/i.test(navigator.userAgent.toLowerCase())) {
-      window.open(this.preferences.storeAppURL.blackberry, '_system');
+      appStoreUrl = this.preferences.storeAppURL.blackberry
     } else if (/(IEMobile|Windows Phone)/i.test(navigator.userAgent.toLowerCase())) {
-      window.open(this.preferences.storeAppURL.windows8, '_system');
+      appStoreUrl = this.preferences.storeAppURL.windows8
+    }
+    if (window.cordova && window.cordova.ThemeableBrowser) {
+      window.cordova.ThemeableBrowser.open(appStoreUrl, '_system');
+    } else {
+      window.open(appStoreUrl, '_system');
     }
     return this;
   };

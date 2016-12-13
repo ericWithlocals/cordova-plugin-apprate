@@ -17,12 +17,13 @@
  * specific language governing permissions and limitations
  * under the License.
  *
- */;
+ */
+;
 var Locale, Locales;
 
 Locale = (function() {
-  function Locale(_arg) {
-    this.language = _arg.language, this.title = _arg.title, this.message = _arg.message, this.cancelButtonLabel = _arg.cancelButtonLabel, this.laterButtonLabel = _arg.laterButtonLabel, this.rateButtonLabel = _arg.rateButtonLabel;
+  function Locale(arg) {
+    this.language = arg.language, this.title = arg.title, this.message = arg.message, this.cancelButtonLabel = arg.cancelButtonLabel, this.laterButtonLabel = arg.laterButtonLabel, this.rateButtonLabel = arg.rateButtonLabel;
     this;
   }
 
@@ -55,12 +56,12 @@ Locales = (function() {
   };
 
   Locales.getLocalesNames = function() {
-    var locale, _results;
-    _results = [];
+    var locale, results;
+    results = [];
     for (locale in locales) {
-      _results.push(locale);
+      results.push(locale);
     }
-    return _results;
+    return results;
   };
 
   return Locales;
@@ -185,6 +186,15 @@ Locales.addLocale(new Locale({
 }));
 
 Locales.addLocale(new Locale({
+  language: 'fi',
+  title: "Arvostele %@",
+  message: "Jos tykkäät %@ sovelluksesta, haluatko kirjoittaa sille arvostelun? Arvostelun kirjoittamiseen ei mene montaa minuuttia. Kiitos tuestasi!",
+  cancelButtonLabel: "Ei kiitos",
+  laterButtonLabel: "Muistuta minua myöhemmin",
+  rateButtonLabel: "Arvostele nyt"
+}));
+
+Locales.addLocale(new Locale({
   language: 'fr',
   title: "Notez %@",
   message: "Si vous aimez utiliser %@, n’oubliez pas de voter sur l’App Store. Cela ne prend qu’une minute. Merci d’avance pour votre soutien !",
@@ -222,11 +232,11 @@ Locales.addLocale(new Locale({
 
 Locales.addLocale(new Locale({
   language: 'it',
-  title: "Vota %@",
-  message: "Se ti piace utilizzare %@, ti dispiacerebbe darle un voto? Non ci vorrà più di un minuto. Grazie per il vostro supporto!",
+  title: "Valuta %@",
+  message: "Ti piace %@? Puoi dare il tuo voto nello store. Ti basterà un minuto! Grazie!",
   cancelButtonLabel: "No, grazie",
-  laterButtonLabel: "Ricordamelo dopo",
-  rateButtonLabel: "Vota ora"
+  laterButtonLabel: "Più tardi",
+  rateButtonLabel: "Valuta ora"
 }));
 
 Locales.addLocale(new Locale({
@@ -326,6 +336,15 @@ Locales.addLocale(new Locale({
   cancelButtonLabel: "Nej tack",
   laterButtonLabel: "Påminn mig senare",
   rateButtonLabel: "Betygsätt nu!"
+}));
+
+Locales.addLocale(new Locale({
+  language: 'ta',
+  title: "%@ மதிப்பிடு",
+  message: "%@ பிடித்திருந்தால், நீங்கள் அதை மதிப்பிட ஒரு கணம் எடுக்க முடியுமா? அது ஒரு நிமிடம் தான் எடுக்கும். உங்கள் ஒத்துழைப்புக்கு நன்றி!",
+  cancelButtonLabel: "இல்லை, நன்றி",
+  laterButtonLabel: "பின்னர் நினைவூட்டு",
+  rateButtonLabel: "இப்போது மதிப்பிடு"
 }));
 
 Locales.addLocale(new Locale({
