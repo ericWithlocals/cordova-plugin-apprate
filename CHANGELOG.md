@@ -1,4 +1,6 @@
 # Changelog
+- 1.3.1
+  - Also compatitable with ThemeableBrowser now
 - 1.3.0
   - Added a general done callbacks called once we have completed the job, not showing or showing the popup
 - 1.2.1

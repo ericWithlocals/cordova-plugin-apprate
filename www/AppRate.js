@@ -208,6 +208,7 @@ AppRate = (function() {
   AppRate.navigateToAppStore = function() {
     var iOSVersion;
     var PREF_STORE_URL_FORMAT_IOS;
+    var appStoreUrl;
     if (/(iPhone|iPod|iPad)/i.test(navigator.userAgent.toLowerCase())) {
       if (this.preferences.openStoreInApp) {
         exec(null, null, 'AppRate', 'launchAppStore', [this.preferences.storeAppURL.ios]);
@@ -219,16 +220,21 @@ AppRate = (function() {
         } else {
           PREF_STORE_URL_FORMAT_IOS = PREF_STORE_URL_FORMAT_IOS9;
         }
-        window.open(PREF_STORE_URL_FORMAT_IOS + this.preferences.storeAppURL.ios, '_system');
+        appStoreUrl = PREF_STORE_URL_FORMAT_IOS + this.preferences.storeAppURL.ios;
       }
     } else if (/(Android)/i.test(navigator.userAgent.toLowerCase())) {
-      window.open(this.preferences.storeAppURL.android, '_system');
+      appStoreUrl = this.preferences.storeAppURL.android
     } else if (/(Windows|Edge)/i.test(navigator.userAgent.toLowerCase())) {
-      window.open(this.preferences.storeAppURL.windows, '_blank');
+      appStoreUrl = this.preferences.storeAppURL.windows
     } else if (/(BlackBerry)/i.test(navigator.userAgent.toLowerCase())) {
-      window.open(this.preferences.storeAppURL.blackberry, '_system');
+      appStoreUrl = this.preferences.storeAppURL.blackberry
     } else if (/(IEMobile|Windows Phone)/i.test(navigator.userAgent.toLowerCase())) {
-      window.open(this.preferences.storeAppURL.windows8, '_system');
+      appStoreUrl = this.preferences.storeAppURL.windows8
+    }
+    if (window.cordova && window.cordova.ThemeableBrowser) {
+      window.cordova.ThemeableBrowser.open(appStoreUrl, '_system');
+    } else {
+      window.open(appStoreUrl, '_system');
     }
     return this;
   };
